@@ -1,16 +1,20 @@
 package br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.service;
 
-import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Category;
+import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.FoodResponseDto;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Food;
-import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.repository.CategoryRepository;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.repository.FoodRepository;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.service.interfaces.FoodService;
+import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.util.ObjectBuilder;
+import com.amazonaws.services.s3.model.S3Object;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Base64;
 
 @Service
 @Slf4j
@@ -41,8 +45,12 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
-    public Food findById(Long id) {
-        return null;
+    public FoodResponseDto findById(Long id) {
+        Food foodFound = this.foodRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Was not possible found a food with id %d", id)));
+        byte[] foodImage = s3Service.getObject(foodFound.getFileName());
+
+        return ObjectBuilder.foodResponseDto(foodFound, foodImage);
     }
 
     @Override
