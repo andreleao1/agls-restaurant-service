@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 public class Food {
 
@@ -27,12 +29,14 @@ public class Food {
     @Size(max = 100)
     private String description;
 
+    @Column(nullable = false)
+    private String fileName;
+
     @PositiveOrZero
     @NotNull
     private BigDecimal value;
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "cateogry_id")
     private Category category;
 }
