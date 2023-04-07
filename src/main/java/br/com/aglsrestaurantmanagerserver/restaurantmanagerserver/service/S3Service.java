@@ -29,6 +29,7 @@ public class S3Service {
         File file = convertToFile(multipartFile);
         String fileName = System.currentTimeMillis() + "_" + multipartFile.getOriginalFilename();
         try{
+            log.debug("Uploading file to bucket");
             s3Client.putObject(new PutObjectRequest(bucketName, fileName,file));
         }catch (AmazonS3Exception e) {
             log.error("Error to upload file");
