@@ -24,13 +24,13 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     public Food save(MultipartFile multipartFile, Food food) {
-        food.setFileName(s3Service.uploadFile(multipartFile));
+        String fileName = s3Service.uploadFile(multipartFile);
         try {
+            food.setFileName(fileName);
             return this.foodRepository.save(food);
         } catch (Exception e) {
-            log.error("Error to save food", e);
-            log.debug("Applying rollback...");
-            //TODO reverter operações na bucket
+            log.error("Error to save food, applying rollback...");
+            s3Service.deleteFile(fileName);
         }
         return null;
     }

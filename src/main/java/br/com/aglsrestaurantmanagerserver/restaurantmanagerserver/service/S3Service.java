@@ -40,6 +40,16 @@ public class S3Service {
         return fileName;
     }
 
+    public void deleteFile(String fileName) {
+        try {
+            log.debug(String.format("Deleting %s file", fileName));
+            s3Client.deleteObject(bucketName, fileName);
+        } catch (AmazonS3Exception e) {
+            log.error("Error to delete file");
+            throw new AmazonS3Exception(e.getMessage());
+        }
+    }
+
     private File convertToFile(MultipartFile file) {
         File convertedFile = new File(file.getOriginalFilename());
         try(FileOutputStream fileOutputStream = new FileOutputStream(convertedFile)) {
