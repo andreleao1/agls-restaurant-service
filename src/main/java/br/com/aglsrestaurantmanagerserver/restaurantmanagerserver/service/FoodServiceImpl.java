@@ -10,12 +10,15 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.util.Base64;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -68,8 +71,18 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
-    public FoodResponseDto findByValueBetween(BigDecimal initialValue, BigDecimal finalValue) {
-        return null;
+    public Page<FoodResponseDto> findByValueRange(BigDecimal initialValue, BigDecimal finalValue, Pageable pageable) {
+        Page<Food> foods = this.foodRepository.findByValueRange(initialValue, finalValue, pageable);
+
+        if(!foods.getContent().isEmpty()) {
+            List<FoodResponseDto> foodsResponse = new ArrayList<>();
+            foods.getContent().forEach(food -> {
+                byte[] foodImage = s3Service.getObject(food.getFileName());
+                foodsResponse.add(ObjectBuilder.foodResponseDto(food, foodImage));
+            });
+            return new PageImpl<FoodResponseDto>(foodsResponse);
+        }
+        return new PageImpl<FoodResponseDto>(new ArrayList<>());
     }
 
     @Override

@@ -2,6 +2,8 @@ package br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.service.inter
 
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.FoodResponseDto;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Food;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 
@@ -10,5 +12,5 @@ public interface FoodService extends ServiceFile<Food> {
 
     FoodResponseDto findByCategory(Long categoryId);
 
-    FoodResponseDto findByValueBetween(BigDecimal initialValue, BigDecimal finalValue);
+    Page<FoodResponseDto> findByValueRange(BigDecimal initialValue, BigDecimal finalValue, Pageable pageable);
 }
