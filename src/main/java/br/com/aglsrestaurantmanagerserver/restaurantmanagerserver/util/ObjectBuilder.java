@@ -5,6 +5,7 @@ import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Categor
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Food;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class ObjectBuilder {
 
@@ -21,9 +22,9 @@ public class ObjectBuilder {
         return FoodResponseDto.builder()
                 .id(food.getId())
                 .name(food.getName())
-                .description(food.getDescription())
+                .description(Objects.nonNull(food.getDescription()) ? food.getDescription():null)
                 .value(food.getValue().toString())
-                .category(food.getCategory())
+                .category(Category.builder().id(food.getCategory().getId()).name(food.getCategory().getName()).build())
                 .foodImage(foodImage)
                 .build();
     }

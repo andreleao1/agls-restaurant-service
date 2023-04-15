@@ -29,4 +29,9 @@ public class FoodController {
     public ResponseEntity<FoodResponseDto> findById(@PathVariable Long id) {
         return ResponseEntity.ok(this.foodService.findById(id));
     }
+
+    @GetMapping("/find-by-category/{id}")
+    public ResponseEntity<FoodResponseDto> findByCategory(@PathVariable("id") Long categoryId) {
+        return ResponseEntity.ok(this.foodService.findByCategory(categoryId));
+    }
 }
