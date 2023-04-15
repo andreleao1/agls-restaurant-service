@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -106,6 +108,23 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     public void deleteById(Long id) {
+        try {
+            String fileName = getFoodFileName(id);
+            if(Objects.isNull(fileName)) {
+                String message = String.format("Was not possible found a food with id %d", id);
+                log.error(message);
+                throw new EntityNotFoundException(message);
+            }
+            this.foodRepository.deleteById(id);
+            s3Service.deleteFile(fileName);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
 
+    private String getFoodFileName(Long id) {
+        Optional<Food> food = this.foodRepository.findById(id);
+        return food.isPresent() ? food.get().getFileName():null;
     }
 }

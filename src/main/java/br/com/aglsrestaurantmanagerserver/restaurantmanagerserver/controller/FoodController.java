@@ -54,4 +54,10 @@ public class FoodController {
         BigDecimal finalPrice = BigDecimal.valueOf(Double.parseDouble(finalValue));
         return ResponseEntity.ok(this.foodService.findByValueRange(initialPrice, finalPrice, pageable));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        this.foodService.deleteById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
