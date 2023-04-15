@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public interface FoodService extends ServiceFile<Food> {
     FoodResponseDto findById(Long id);
 
-    FoodResponseDto findByCategory(Long categoryId);
+    Page<FoodResponseDto> findByCategory(Long categoryId, Pageable pageable);
 
     Page<FoodResponseDto> findByValueRange(BigDecimal initialValue, BigDecimal finalValue, Pageable pageable);
 }

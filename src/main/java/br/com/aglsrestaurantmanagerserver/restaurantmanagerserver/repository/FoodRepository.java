@@ -9,8 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface FoodRepository extends JpaRepository<Food, Long> {
@@ -24,7 +22,7 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
             "category_id " +
             "from food " +
            " where category_id = :categoryId", nativeQuery = true)
-    Optional<Food> findByCategory(@Param("categoryId") Long categoryId);
+    Page<Food> findByCategory(@Param("categoryId") Long categoryId, Pageable pageable);
 
     @Query(value =
                 "select " +

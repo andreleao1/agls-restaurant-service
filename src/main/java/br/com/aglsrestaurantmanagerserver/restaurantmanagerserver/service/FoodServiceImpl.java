@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -61,20 +60,22 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
-    public FoodResponseDto findByCategory(Long categoryId) {
-        Food foodFound = this.foodRepository
-                .findByCategory(categoryId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Was not possible found a food by categoty with id %d", categoryId)));
-        foodFound.setCategory(this.categoryService.findById(foodFound.getCategory().getId()));
-        byte[] foodImage = s3Service.getObject(foodFound.getFileName());
-        return ObjectBuilder.foodResponseDto(foodFound, foodImage);
+    public Page<FoodResponseDto> findByCategory(Long categoryId, Pageable pageable) {
+        log.info(String.format("Finding foods for category %d", categoryId));
+        Page<Food> foods = this.foodRepository.findByCategory(categoryId, pageable);
+        return buildPageOfFoodResponseDto(foods);
     }
 
     @Override
     public Page<FoodResponseDto> findByValueRange(BigDecimal initialValue, BigDecimal finalValue, Pageable pageable) {
+        log.info(String.format("Finding foods for price between %s and %s", initialValue.toString(), finalValue.toString()));
         Page<Food> foods = this.foodRepository.findByValueRange(initialValue, finalValue, pageable);
+        return buildPageOfFoodResponseDto(foods);
+    }
 
+    private Page<FoodResponseDto> buildPageOfFoodResponseDto(Page<Food> foods) {
         if(!foods.getContent().isEmpty()) {
+            log.debug("Building page of FoodResponseDto");
             List<FoodResponseDto> foodsResponse = new ArrayList<>();
             foods.getContent().forEach(food -> {
                 byte[] foodImage = s3Service.getObject(food.getFileName());

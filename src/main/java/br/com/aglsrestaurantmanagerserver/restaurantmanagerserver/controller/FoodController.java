@@ -34,8 +34,8 @@ public class FoodController {
     }
 
     @GetMapping("/find-by-category/{id}")
-    public ResponseEntity<FoodResponseDto> findByCategory(@PathVariable("id") Long categoryId) {
-        return ResponseEntity.ok(this.foodService.findByCategory(categoryId));
+    public ResponseEntity<Page<FoodResponseDto>> findByCategory(@PathVariable("id") Long categoryId, Pageable pageable) {
+        return ResponseEntity.ok(this.foodService.findByCategory(categoryId, pageable));
     }
 
     @GetMapping("/find-by-price")
