@@ -7,6 +7,5 @@ import org.springframework.web.multipart.MultipartFile;
 public interface ServiceFile <T> {
     T save(MultipartFile multipartFile, T t);
     T updade(T t);
-    Page<T> findAll(Pageable pageable);
     void deleteById(Long id);
 }

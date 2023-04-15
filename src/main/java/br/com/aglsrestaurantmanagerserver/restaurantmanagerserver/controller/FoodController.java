@@ -28,9 +28,19 @@ public class FoodController {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.foodService.save(file, food));
     }
 
+    @GetMapping
+    public ResponseEntity<Page<FoodResponseDto>> list(Pageable pageable) {
+        return ResponseEntity.ok(this.foodService.findAll(pageable));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<FoodResponseDto> findById(@PathVariable Long id) {
         return ResponseEntity.ok(this.foodService.findById(id));
+    }
+
+    @GetMapping("find-by-name")
+    public ResponseEntity<FoodResponseDto> findByName(@PathParam("name") String name) {
+        return ResponseEntity.ok(this.foodService.findByName(name));
     }
 
     @GetMapping("/find-by-category/{id}")

@@ -60,6 +60,18 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
+    public FoodResponseDto findByName(String name) {
+        Food foodFound = this.foodRepository.findByName(name).orElseThrow(() -> {
+            String message = String.format("Was not possible found a food with name %s", name);
+            log.error(message);
+            throw new EntityNotFoundException(message);
+        });
+
+        byte[] foodImage = s3Service.getObject(foodFound.getFileName());
+        return ObjectBuilder.foodResponseDto(foodFound, foodImage);
+    }
+
+    @Override
     public Page<FoodResponseDto> findByCategory(Long categoryId, Pageable pageable) {
         log.info(String.format("Finding foods for category %d", categoryId));
         Page<Food> foods = this.foodRepository.findByCategory(categoryId, pageable);
@@ -70,6 +82,12 @@ public class FoodServiceImpl implements FoodService {
     public Page<FoodResponseDto> findByValueRange(BigDecimal initialValue, BigDecimal finalValue, Pageable pageable) {
         log.info(String.format("Finding foods for price between %s and %s", initialValue.toString(), finalValue.toString()));
         Page<Food> foods = this.foodRepository.findByValueRange(initialValue, finalValue, pageable);
+        return buildPageOfFoodResponseDto(foods);
+    }
+
+    @Override
+    public Page<FoodResponseDto> findAll(Pageable pageable) {
+        Page<Food> foods = this.foodRepository.findAll(pageable);
         return buildPageOfFoodResponseDto(foods);
     }
 
@@ -84,11 +102,6 @@ public class FoodServiceImpl implements FoodService {
             return new PageImpl<FoodResponseDto>(foodsResponse);
         }
         return new PageImpl<FoodResponseDto>(new ArrayList<>());
-    }
-
-    @Override
-    public Page<Food> findAll(Pageable pageable) {
-        return null;
     }
 
     @Override

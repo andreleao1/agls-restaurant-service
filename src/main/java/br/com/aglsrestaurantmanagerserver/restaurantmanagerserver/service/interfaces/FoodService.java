@@ -8,7 +8,12 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 
 public interface FoodService extends ServiceFile<Food> {
+
     FoodResponseDto findById(Long id);
+
+    FoodResponseDto findByName(String name);
+
+    Page<FoodResponseDto> findAll(Pageable pageable);
 
     Page<FoodResponseDto> findByCategory(Long categoryId, Pageable pageable);
 

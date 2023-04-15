@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Repository
 public interface FoodRepository extends JpaRepository<Food, Long> {
@@ -35,4 +36,6 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
                 "from food " +
                 " where value between :initialValue and :finalValue", nativeQuery = true )
     Page<Food> findByValueRange(@Param("initialValue")BigDecimal initialValue, @Param("finalValue")BigDecimal finalValue, Pageable pageable);
+
+    Optional<Food> findByName(String name);
 }
