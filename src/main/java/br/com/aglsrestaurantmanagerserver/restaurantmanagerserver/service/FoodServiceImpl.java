@@ -8,6 +8,7 @@ import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.service.interf
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.util.ObjectBuilder;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +50,13 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
-    public Food updade(Food food) {
-        return null;
+    public Food updade(MultipartFile file, Food food) {
+        Food foodFound = this.foodRepository.findById(food.getId())
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Was not possible found a food with id %d", food.getId())));
+
+        BeanUtils.copyProperties(food, foodFound, "id", "fileName");
+        s3Service.deleteFile(foodFound.getFileName());
+        return save(file, foodFound);
     }
 
     @Override

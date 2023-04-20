@@ -6,6 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface ServiceFile <T> {
     T save(MultipartFile multipartFile, T t);
-    T updade(T t);
+    T updade(MultipartFile file, T t);
     void deleteById(Long id);
 }

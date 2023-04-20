@@ -28,6 +28,12 @@ public class FoodController {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.foodService.save(file, food));
     }
 
+    @PutMapping
+    public ResponseEntity<Food> update(@RequestParam("id") Long id, @RequestParam("file") MultipartFile file, @RequestParam("name") String name, @RequestParam("description") String description, @RequestParam("value") String value, @RequestParam("category") String categoryId) {
+        Food food = ObjectBuilder.foodBuilder(id, name, description, value, categoryId);
+        return ResponseEntity.ok(this.foodService.updade(file, food));
+    }
+
     @GetMapping
     public ResponseEntity<Page<FoodResponseDto>> list(Pageable pageable) {
         return ResponseEntity.ok(this.foodService.findAll(pageable));

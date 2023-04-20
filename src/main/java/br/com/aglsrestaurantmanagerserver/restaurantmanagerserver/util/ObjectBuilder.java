@@ -18,6 +18,16 @@ public class ObjectBuilder {
                 .build();
     }
 
+    public static Food foodBuilder(Long id, String name, String description, String value, String categoryId) {
+        return Food.builder()
+                .id(id)
+                .name(name)
+                .description(description.isEmpty() || description.isBlank() ? null:description)
+                .value(BigDecimal.valueOf(Double.parseDouble(value)))
+                .category(Category.builder().id(Long.parseLong(categoryId)).build())
+                .build();
+    }
+
     public static FoodResponseDto foodResponseDto(Food food, byte[] foodImage) {
         return FoodResponseDto.builder()
                 .id(food.getId())
