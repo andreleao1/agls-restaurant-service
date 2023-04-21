@@ -1,6 +1,6 @@
 package br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.service;
 
-import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.FoodResponseDto;
+import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.food.FoodResponseDto;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Food;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.repository.FoodRepository;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.service.interfaces.CategoryService;
@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +65,11 @@ public class FoodServiceImpl implements FoodService {
         byte[] foodImage = s3Service.getObject(foodFound.getFileName());
 
         return ObjectBuilder.foodResponseDto(foodFound, foodImage);
+    }
+
+    @Override
+    public BigDecimal getValueById(Long id) {
+        return this.foodRepository.getValueById(id);
     }
 
     @Override
