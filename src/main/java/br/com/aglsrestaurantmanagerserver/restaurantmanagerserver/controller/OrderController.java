@@ -1,10 +1,9 @@
 package br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.controller;
 
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.order.CloseOrderDto;
-import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.order.CloseOrderResponseDto;
+import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.order.OrderUpdatedResponseDto;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Order;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.service.interfaces.OrderService;
-import com.amazonaws.Response;
 import jakarta.validation.Valid;
 import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +25,14 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.orderService.openingOrder(order));
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<OrderUpdatedResponseDto> updateOrder(@PathParam("orderId")String orderId, @RequestBody Order order) {
+        order.setId(UUID.fromString(orderId));
+        return ResponseEntity.ok(this.orderService.updateOrder(order));
+    }
+
     @PutMapping("/close")
-    public ResponseEntity<CloseOrderResponseDto> closeOrder(@RequestBody CloseOrderDto closeOrderDto) {
+    public ResponseEntity<OrderUpdatedResponseDto> closeOrder(@RequestBody CloseOrderDto closeOrderDto) {
         return ResponseEntity.ok(this.orderService.closeOrder(closeOrderDto));
     }
 

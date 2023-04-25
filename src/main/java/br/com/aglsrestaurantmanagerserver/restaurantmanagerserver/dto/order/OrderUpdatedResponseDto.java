@@ -5,12 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CloseOrderResponseDto {
+public class OrderUpdatedResponseDto {
 
     private Boolean status;
-    private String orderId;
+    private UUID orderId;
 }

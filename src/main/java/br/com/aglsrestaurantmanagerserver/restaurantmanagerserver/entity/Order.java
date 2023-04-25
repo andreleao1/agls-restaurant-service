@@ -31,7 +31,7 @@ public class Order {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    private BigDecimal total;
+    private String total;
 
     private PaymentMethod paymentMethod;
 
