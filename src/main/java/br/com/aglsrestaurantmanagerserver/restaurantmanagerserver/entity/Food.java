@@ -1,5 +1,6 @@
 package br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -41,6 +42,7 @@ public class Food {
     @ManyToOne
     private Category category;
 
+    @JsonBackReference
     @ManyToMany(mappedBy = "foods")
     private List<Order> orders;
 }

@@ -11,6 +11,8 @@ import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.service.interf
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,6 +81,20 @@ public class OrderServiceImpl implements OrderService {
                 .paymentMethod(Objects.nonNull(orderFound.get("payment_method")) ? (PaymentMethod) orderFound.get("payment_method"):null)
                 .isPaid((Boolean) orderFound.get("is_paid"))
                 .build();
+    }
+
+    @Override
+    public Page<Order> listOrders(Pageable pageable) {
+        return this.orderRepository.findAll(pageable);
+    }
+
+    @Override
+    public Order recoverOrder(String orderId) {
+        return this.orderRepository.findById(orderId).orElseThrow(() -> {
+            String message = String.format("unable to find order with id %s", orderId);
+            log.error(message);
+            throw new EntityNotFoundException(message);
+        });
     }
 
     @Override

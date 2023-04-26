@@ -14,4 +14,5 @@ public class CloseOrderDto {
 
     private String orderId;
     private PaymentMethod paymentMethod;
+    private String paidValue;
 }

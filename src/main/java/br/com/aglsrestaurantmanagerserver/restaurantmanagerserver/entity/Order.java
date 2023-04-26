@@ -1,5 +1,6 @@
 package br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,6 +37,7 @@ public class Order {
     @Builder.Default
     private boolean isPaid = false;
 
+    @JsonManagedReference
     @ManyToMany
     @JoinTable(
             name = "order_food",
