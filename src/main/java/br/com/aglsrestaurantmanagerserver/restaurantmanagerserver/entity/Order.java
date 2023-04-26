@@ -41,7 +41,6 @@ public class Order {
     @Builder.Default
     private boolean isPaid = false;
 
-    // @JsonManagedReference
     @ManyToMany
     @JoinTable(
             name = "order_food",
