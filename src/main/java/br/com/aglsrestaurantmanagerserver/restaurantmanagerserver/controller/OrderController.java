@@ -1,6 +1,7 @@
 package br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.controller;
 
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.order.CloseOrderDto;
+import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.order.ClosedOrderDto;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.order.OrderUpdatedResponseDto;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Order;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.service.interfaces.OrderService;
@@ -33,8 +34,8 @@ public class OrderController {
     }
 
     @PutMapping("/close")
-    public ResponseEntity<OrderUpdatedResponseDto> closeOrder(@RequestBody CloseOrderDto closeOrderDto) {
-        return ResponseEntity.ok(this.orderService.closeOrder(closeOrderDto));
+    public ResponseEntity<ClosedOrderDto> closeOrder(@RequestParam("orderId") String orderId, @RequestBody CloseOrderDto closeOrderDto) {
+        return ResponseEntity.ok(this.orderService.closeOrder(orderId, closeOrderDto));
     }
 
     @GetMapping

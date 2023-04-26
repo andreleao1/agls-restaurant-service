@@ -4,6 +4,8 @@ create table restaurant_order(
      updated_at timestamp,
      payment_method varchar,
      total varchar,
+     paid_value varchar,
+     change varchar,
      is_paid boolean not null default false
 );
 

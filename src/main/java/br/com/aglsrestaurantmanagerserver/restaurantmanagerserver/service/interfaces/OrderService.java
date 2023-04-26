@@ -1,6 +1,7 @@
 package br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.service.interfaces;
 
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.order.CloseOrderDto;
+import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.order.ClosedOrderDto;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.order.OrderUpdatedResponseDto;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Order;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,7 @@ public interface OrderService {
 
     Order recoverOrder(String orderId);
 
-    OrderUpdatedResponseDto closeOrder(CloseOrderDto closeOrderDto);
+    ClosedOrderDto closeOrder(String orderId, CloseOrderDto closeOrderDto);
 
     OrderUpdatedResponseDto updateOrder(String orderId, Order order);
 

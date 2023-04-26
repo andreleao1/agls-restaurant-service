@@ -32,12 +32,16 @@ public class Order {
 
     private String total;
 
+    private String paidValue;
+
+    private String change;
+
     private PaymentMethod paymentMethod;
 
     @Builder.Default
     private boolean isPaid = false;
 
-    @JsonManagedReference
+    // @JsonManagedReference
     @ManyToMany
     @JoinTable(
             name = "order_food",

@@ -10,8 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CloseOrderDto {
+public class ClosedOrderDto {
 
+    private String orderId;
     private PaymentMethod paymentMethod;
     private String paidValue;
+    private String change;
+    private Boolean status;
 }

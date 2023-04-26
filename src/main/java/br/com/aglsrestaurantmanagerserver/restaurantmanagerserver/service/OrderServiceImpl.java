@@ -1,6 +1,7 @@
 package br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.service;
 
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.order.CloseOrderDto;
+import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.order.ClosedOrderDto;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.order.OrderUpdatedResponseDto;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Food;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Order;
@@ -85,29 +86,78 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<Order> listOrders(Pageable pageable) {
-        return this.orderRepository.findAll(pageable);
+        Page<Order> ordersPage = this.orderRepository.findAll(pageable);
+
+        if (!ordersPage.getContent().isEmpty()) {
+            ordersPage.getContent().forEach(order -> {
+                order.getFoods().forEach(food -> {
+                    food.setOrders(null);
+                });
+            });
+        }
+
+        return ordersPage;
     }
 
     @Override
     public Order recoverOrder(String orderId) {
-        return this.orderRepository.findById(orderId).orElseThrow(() -> {
+        Order order = this.orderRepository.findById(orderId).orElseThrow(() -> {
             String message = String.format("unable to find order with id %s", orderId);
             log.error(message);
             throw new EntityNotFoundException(message);
         });
+
+        order.getFoods().forEach(food -> {
+            food.setOrders(null);
+        });
+
+        return order;
     }
 
     @Override
-    public OrderUpdatedResponseDto closeOrder(CloseOrderDto closeOrderDto) {
-        Order order = this.orderRepository.findById(closeOrderDto.getOrderId()).orElseThrow();
+    public ClosedOrderDto closeOrder(String orderId, CloseOrderDto closeOrderDto) {
+        Order order = this.orderRepository.findById(orderId).orElseThrow();
+
+        if (order.isPaid()) {
+            String message = String.format("Order %s already paid", order.getId());
+            log.warn(message);
+            throw new RuntimeException(message);
+        }
+
+        if (!isPaidValueEnough(order.getTotal(), closeOrderDto.getPaidValue())) {
+            String message = "The paid value is not enough";
+            log.error(message);
+            throw new RuntimeException(message);
+        }
+
+        if (closeOrderDto.getPaymentMethod().equals(PaymentMethod.CASH)) {
+            order.setChange(processChange(order.getTotal(), closeOrderDto.getPaidValue()).toString());
+        }
+
         order.setPaymentMethod(closeOrderDto.getPaymentMethod());
+        order.setPaidValue(closeOrderDto.getPaidValue());
         order.setPaid(true);
 
         try {
             this.orderRepository.save(order);
-            return  OrderUpdatedResponseDto.builder().status(true).orderId(UUID.fromString(closeOrderDto.getOrderId())).build();
+            return  ClosedOrderDto.builder()
+                    .orderId(order.getId())
+                    .paidValue(order.getPaidValue())
+                    .change(order.getChange())
+                    .paymentMethod(order.getPaymentMethod())
+                    .status(Boolean.TRUE)
+                    .build();
         } catch (Exception e) {
+            log.error("Error to close order " + order.getId());
             throw new RuntimeException();
         }
+    }
+
+    private Boolean isPaidValueEnough(String orderTotalValue, String paidValue) {
+        return BigDecimal.valueOf(Double.parseDouble(orderTotalValue)).compareTo(BigDecimal.valueOf(Double.parseDouble(paidValue))) == -1;
+    }
+
+    private BigDecimal processChange(String orderValue, String paidValue) {
+        return BigDecimal.valueOf(Double.parseDouble(paidValue)).subtract(BigDecimal.valueOf(Double.parseDouble(orderValue)));
     }
 }

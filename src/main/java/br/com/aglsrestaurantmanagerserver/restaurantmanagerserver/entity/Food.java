@@ -42,7 +42,7 @@ public class Food {
     @ManyToOne
     private Category category;
 
-    @JsonBackReference
+   // @JsonBackReference
     @ManyToMany(mappedBy = "foods")
     private List<Order> orders;
 }
