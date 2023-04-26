@@ -1,14 +1,13 @@
 create table restaurant_order(
      id varchar not null primary key,
-     created_at timestamp not null,
-     updated_at timestamp not null,
+     created_at timestamp,
+     updated_at timestamp,
      payment_method varchar,
      total varchar,
      is_paid boolean not null default false
 );
 
 create table order_food(
-    id serial primary key,
     food_id integer not null,
     order_id varchar not null,
 

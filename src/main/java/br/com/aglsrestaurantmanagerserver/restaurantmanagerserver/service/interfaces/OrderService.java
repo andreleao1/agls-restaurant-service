@@ -10,7 +10,5 @@ public interface OrderService {
 
     OrderUpdatedResponseDto closeOrder(CloseOrderDto closeOrderDto);
 
-    Order recoverOrderById(String id);
-
-    OrderUpdatedResponseDto updateOrder(Order order);
+    OrderUpdatedResponseDto updateOrder(String orderId, Order order);
 }

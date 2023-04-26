@@ -4,9 +4,7 @@ import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.order.Clos
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.order.OrderUpdatedResponseDto;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Food;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Order;
-import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.OrderFood;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.PaymentMethod;
-import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.repository.OrderFoodRepository;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.repository.OrderRepository;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.service.interfaces.FoodService;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.service.interfaces.OrderService;
@@ -29,9 +27,6 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private FoodService foodService;
 
-    @Autowired
-    private OrderFoodRepository orderFoodRepository;
-
 
     @Override
     public Order openingOrder(Order order) {
@@ -39,19 +34,23 @@ public class OrderServiceImpl implements OrderService {
         return this.orderRepository.save(order);
     }
 
-
-
+    @Transactional
     @Override
-    public OrderUpdatedResponseDto closeOrder(CloseOrderDto closeOrderDto) {
-        Order order = this.orderRepository.findById(UUID.fromString(closeOrderDto.getOrderId())).orElseThrow();
-        order.setPaymentMethod(closeOrderDto.getPaymentMethod());
-        order.setPaid(true);
-
+    public OrderUpdatedResponseDto updateOrder(String orderId, Order order) {
         try {
-            this.orderRepository.save(order);
-            return  OrderUpdatedResponseDto.builder().status(true).orderId(UUID.fromString(closeOrderDto.getOrderId())).build();
-        } catch (Exception e) {
-            throw new RuntimeException();
+            Order orderFound = getOrder(orderId);
+            log.info(String.format("Updating order %s, order body: %s", order.getId(), order.toString()));
+            orderFound.setTotal(updateTotalValue(order.getFoods()));
+            orderFound.setFoods(order.getFoods());
+            return OrderUpdatedResponseDto.builder().orderId(UUID.fromString(this.orderRepository.save(orderFound).getId())).status(true).build();
+        } catch (EntityNotFoundException e) {
+            String message = String.format("Unable to find a order with id %s", order.getId().toString());
+            log.error(message);
+            throw new EntityNotFoundException(message);
+        }
+        catch (Exception e) {
+            log.error("Error to update order " + order.getId());
+            throw new RuntimeException(e.getCause());
         }
     }
 
@@ -66,71 +65,33 @@ public class OrderServiceImpl implements OrderService {
         return BigDecimal.ZERO.toString();
     }
 
+    private Order getOrder(String id) {
+        log.info("Applying select in the database");
+        Map<String, ?> orderFound = this.orderRepository.findByOrderId(id.toString());
 
+        if(orderFound.isEmpty()) {
+            throw new EntityNotFoundException();
+        }
+
+        return Order.builder()
+                .id(Objects.nonNull(orderFound.get("id")) ? (String) orderFound.get("id"):null)
+                .total(Objects.nonNull(orderFound.get("total")) ? (String) orderFound.get("total"):BigDecimal.ZERO.toString())
+                .paymentMethod(Objects.nonNull(orderFound.get("payment_method")) ? (PaymentMethod) orderFound.get("payment_method"):null)
+                .isPaid((Boolean) orderFound.get("is_paid"))
+                .build();
+    }
 
     @Override
-    public Order recoverOrderById(String id) {
-       // List<String> foods = this.orderRepository.findByOrderId(id);
-        return null;
-    }
+    public OrderUpdatedResponseDto closeOrder(CloseOrderDto closeOrderDto) {
+        Order order = this.orderRepository.findById(closeOrderDto.getOrderId()).orElseThrow();
+        order.setPaymentMethod(closeOrderDto.getPaymentMethod());
+        order.setPaid(true);
 
-    @Transactional
-    @Override
-    public OrderUpdatedResponseDto updateOrder(Order order) {
         try {
-            Order orderFound = getOrder(order.getId());
-            log.info(String.format("Updating order %s, order body: %s", order.getId(), order.toString()));
-            internalUpdateOrder(orderFound, order.getFoods());
-            return OrderUpdatedResponseDto.builder().orderId(order.getId()).status(true).build();
-        } catch (EntityNotFoundException e) {
-            String message = String.format("Unable to find a order with id %s", order.getId().toString());
-            log.error(message);
-            throw new EntityNotFoundException(message);
-        }
-        catch (Exception e) {
-            log.error("Error to update order " + order.getId());
-            throw new RuntimeException(e.getCause());
-        }
-    }
-
-    private void internalUpdateOrder(Order orderToUpdate, List<Food> foods) {
-        try {
-            log.info("Updating order value");
-            String currentValue = updateTotalValue(foods);
-            updateOrderFood(orderToUpdate.getId(), foods);
-            this.orderRepository.updateOrder(currentValue, orderToUpdate.getId().toString());
+            this.orderRepository.save(order);
+            return  OrderUpdatedResponseDto.builder().status(true).orderId(UUID.fromString(closeOrderDto.getOrderId())).build();
         } catch (Exception e) {
-            String message = String.format("unable to update order %s", orderToUpdate.getId());
+            throw new RuntimeException();
         }
-    }
-
-    private void updateOrderFood(UUID orderId, List<Food> foods) {
-        try {
-            log.info("cleaning order_food table");
-            this.orderFoodRepository.deleteByOrderId(orderId.toString());
-            log.info("Updating order_food table");
-            foods.forEach(food -> {
-                OrderFood orderFood = OrderFood.builder().foodId(food.getId()).orderId(orderId).build();
-                this.orderFoodRepository.save(orderFood);
-            });
-        } catch (Exception e) {
-            System.out.println(e.getCause());
-        }
-    }
-
-    private Order getOrder(UUID id) {
-            log.info("Applying select in the database");
-            Map<String, ?> orderFound = this.orderRepository.findByOrderId(id.toString());
-
-            if(orderFound.isEmpty()) {
-                throw new EntityNotFoundException();
-            }
-
-            return Order.builder()
-                    .id(UUID.fromString(Objects.nonNull(orderFound.get("id")) ? (String) orderFound.get("id"):null))
-                    .total(Objects.nonNull(orderFound.get("total")) ? (String) orderFound.get("total"):BigDecimal.ZERO.toString())
-                    .paymentMethod(Objects.nonNull(orderFound.get("payment_method")) ? (PaymentMethod) orderFound.get("payment_method"):null)
-                    .isPaid((Boolean) orderFound.get("is_paid"))
-                    .build();
     }
 }

@@ -27,8 +27,7 @@ public class OrderController {
 
     @PutMapping("/update")
     public ResponseEntity<OrderUpdatedResponseDto> updateOrder(@PathParam("orderId")String orderId, @RequestBody Order order) {
-        order.setId(UUID.fromString(orderId));
-        return ResponseEntity.ok(this.orderService.updateOrder(order));
+        return ResponseEntity.ok(this.orderService.updateOrder(orderId, order));
     }
 
     @PutMapping("/close")
@@ -38,6 +37,6 @@ public class OrderController {
 
     @GetMapping("/search")
     public ResponseEntity<Order> recoverOrder(@PathParam("orderId")String orderId) {
-        return ResponseEntity.ok(this.orderService.recoverOrderById(orderId));
+        return ResponseEntity.ok().build();
     }
 }
