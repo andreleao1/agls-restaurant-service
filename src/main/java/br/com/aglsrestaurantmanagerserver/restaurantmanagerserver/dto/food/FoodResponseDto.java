@@ -1,4 +1,4 @@
-package br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto;
+package br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.food;
 
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Category;
 import lombok.AllArgsConstructor;

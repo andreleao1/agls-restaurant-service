@@ -38,4 +38,10 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
     Page<Food> findByValueRange(@Param("initialValue")BigDecimal initialValue, @Param("finalValue")BigDecimal finalValue, Pageable pageable);
 
     Optional<Food> findByName(String name);
+
+    @Query(value = "select " +
+            "value " +
+            "from food " +
+            "where id = :id", nativeQuery = true)
+    BigDecimal getValueById(@Param("id") Long id);
 }

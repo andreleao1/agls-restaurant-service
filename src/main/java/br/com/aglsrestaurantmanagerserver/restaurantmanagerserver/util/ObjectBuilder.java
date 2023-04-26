@@ -1,6 +1,6 @@
 package br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.util;
 
-import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.FoodResponseDto;
+import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.dto.food.FoodResponseDto;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Category;
 import br.com.aglsrestaurantmanagerserver.restaurantmanagerserver.entity.Food;
 
